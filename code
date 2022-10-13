@@ -1,0 +1,88 @@
+#include <fstream>
+#include <cstring>
+
+using namespace std;
+
+ofstream out("data.out");
+
+void read(char f[256]) {
+    ifstream in("date.in");
+    in.getline(f, 256, '\n');
+    in.close();
+}
+
+void build_matrix(char f[], char M[][11], int &number_of_tokens) {
+    char *p, delim[] = " ";
+    number_of_tokens = 0;
+    p = strtok(f, delim);
+    while (p) {
+        strcpy(M[number_of_tokens], p);
+        number_of_tokens++;
+        p = strtok(NULL, delim);
+    }
+}
+
+void sort_M(char Matrix[][11], int dim) {
+    char aux[11];
+    int i, j;
+    for (i = 0; i < dim - 1; i++)
+        for (j = i + 1; j < dim; j++)
+            if (strcmp(Matrix[i], Matrix[j]) > 0) {
+                strcpy(aux, Matrix[i]);
+                strcpy(Matrix[i], Matrix[j]);
+                strcpy(Matrix[j], aux);
+            }
+}
+
+void print(char Matrix[][11], int dim) {
+    for (int i = 0; i < dim; i++)
+        out << Matrix[i] << endl;
+    out << endl;
+}
+
+void print_vector(int vector[], int dim) {
+    for (int i = 0; i < dim; i++)
+        out << vector[i] << endl;
+    out << endl;
+}
+
+void frequency_words(char M[][11], int number_of_tokens, int counting_vector[]) {
+
+    for (int i = 0; i < number_of_tokens - 1; i++) {
+        if (counting_vector[i] == 0) {
+            counting_vector[i] += 1;
+            for (int j = i + 1; j < number_of_tokens; j++) {
+                if (strcmp(M[i], M[j]) == 0) {
+                    counting_vector[i]++;
+                    counting_vector[j] = -1;
+                }
+            }
+        }
+    }
+    if (counting_vector[number_of_tokens - 1] == 0) counting_vector[number_of_tokens - 1] = 1;
+}
+
+void printing_frequency (char M[][11], int vector[], int dim){
+    for (int i = 0; i < dim; i++)
+        if (vector[i] > 0)
+            out << "\"" << M[i] << "\"" << " appears: " << vector[i] << " times." << endl;
+}
+
+int main() {
+    char M[128][11];
+    char f[256];
+    int counting_vector[128] = {0};
+    read(f);
+    int number_of_tokens;
+    build_matrix(f, M, number_of_tokens);
+    frequency_words(M, number_of_tokens, counting_vector);
+    /* out << "Printing the words in the way there were in the sentence:" << endl;
+    print(M, number_of_tokens);
+    sort_M(M, number_of_tokens);
+    out << "Printing the words in a alphabetically sorted way:" << endl;
+    print(M, number_of_tokens);
+     */
+    printing_frequency(M, counting_vector, number_of_tokens);
+    out.close();
+    return 0;
+}
